@@ -1,0 +1,35 @@
+name: Carga Cirugía
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # 6am Argentina (UTC-3)
+  workflow_dispatch:       # para correrlo manualmente
+
+jobs:
+  cargar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Correr script
+        env:
+          SFTP_HOST:     ${{ secrets.SFTP_HOST }}
+          SFTP_USER:     ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PATH:     ${{ secrets.SFTP_PATH }}
+          DB_HOST:       ${{ secrets.DB_HOST }}
+          DB_NAME:       ${{ secrets.DB_NAME }}
+          DB_USER:       ${{ secrets.DB_USER }}
+          DB_PASSWORD:   ${{ secrets.DB_PASSWORD }}
+          DB_PORT:       ${{ secrets.DB_PORT }}
+        run: python scripts/carga_cirugia.py
